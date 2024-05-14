@@ -14,7 +14,9 @@ const authMiddleware = async (req, res, next) => {
       req.userId = decoded.userId;
       next();
     } else {
-      return res.status(403).json({});
+      return res
+        .status(403)
+        .json({ message: "Error in the process of jwt configuration" });
     }
   } catch (err) {
     return res.status(403).json({});

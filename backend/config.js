@@ -1,2 +1,2 @@
-const JWT_SECRET = "this is very secret key this is very secret key ";
-module.exports = JWT_SECRET;
+const DB_NAME = "swiftsend";
+module.exports = { DB_NAME };

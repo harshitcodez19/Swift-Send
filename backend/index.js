@@ -1,14 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const app = express();
+const connectDb = require("./db/db.js");
+const dotenv = require("dotenv");
+const app = require("./app.js");
 
-app.use(cors());
-app.use(express.json());
+dotenv.config({
+  path: "./.env",
+});
 
-const rootRouter = require("./routes/index");
-
-app.use("/api/v1", rootRouter);
-
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
+connectDb()
+  .then(() => {
+    app.listen(process.env.PORT || 3000, () => {
+      console.log(`The Server is running at ${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log("Mongo DB Connection failed !!!!", err);
   });
