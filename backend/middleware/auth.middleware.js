@@ -1,4 +1,4 @@
-const authMiddleware = async (req, res, next) => {
+export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer  ")) {
@@ -21,8 +21,4 @@ const authMiddleware = async (req, res, next) => {
   } catch (err) {
     return res.status(403).json({});
   }
-};
-
-module.exports = {
-  authMiddleware,
 };

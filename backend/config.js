@@ -1,2 +1,1 @@
-const DB_NAME = "swiftsend";
-module.exports = { DB_NAME };
+export const DB_NAME ="swiftsend"

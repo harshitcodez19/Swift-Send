@@ -1,26 +1,27 @@
-const { User } = require("../db/db");
-const zod = require("zod");
-const jwt = require("jsonwebtoken");
+import { User } from "../models/users.model.js";
+import { object, string } from "zod";
+import jwt from "jsonwebtoken";
+import { Account } from "../models/accounts.model.js";
 
-const singInSchema = zod.object({
-  userName: zod.string().email(),
-  password: zod.string(),
+const singInSchema = object({
+  userName: string().email(),
+  password: string(),
 });
 
-const signupSchema = zod.object({
-  userName: zod.string().email(),
-  firstName: zod.string(),
-  lastName: zod.string(),
-  password: zod.string(),
+const signupSchema = object({
+  userName: string().email(),
+  firstName: string(),
+  lastName: string(),
+  password: string(),
 });
 
-const updateSchema = zod.object({
-  password: zod.string().optional(),
-  firstName: zod.string().optional(),
-  lastName: zod.string().optional(),
+const updateSchema = object({
+  password: string().optional(),
+  firstName: string().optional(),
+  lastName: string().optional(),
 });
 
-const signInUser = async (req, res) => {
+export const signInUser = async (req, res) => {
   const body = req.body;
 
   const { success } = singInSchema.safeParse(body);
@@ -56,7 +57,7 @@ const signInUser = async (req, res) => {
   });
 };
 
-const signUpUser = async (req, res) => {
+export const signUpUser = async (req, res) => {
   const body = req.body;
   const { success } = signupSchema.safeParse(req.body);
 
@@ -66,20 +67,32 @@ const signUpUser = async (req, res) => {
     });
   }
 
-  const user = await User.FindOne({
+  const existingUser = await User.FindOne({
     userName: body.userName,
   });
 
-  if (user._id) {
+  if (existingUser) {
     return res.json({
       message: "Email already taken /incorrect user ",
     });
   }
 
-  const dbUser = await User.create(body);
+  const newUser = await User.create({
+    userName: req.body.userName,
+    password: req.body.password,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+  });
+
+  const newUserId = newUser._id;
+
+  await Account.create({
+    newUserId,
+    balance: 1 + Math.random() * 10000,
+  });
   const token = jwt.sign(
     {
-      userId: dbUser._id,
+      userId: newUser._id,
     },
     JWT_SECRET
   );
@@ -90,7 +103,7 @@ const signUpUser = async (req, res) => {
   });
 };
 
-const updateUser = async (req, res) => {
+export const updateUser = async (req, res) => {
   const { success } = updateSchema.safeParse(req.body);
   if (!success) {
     res.status(411).json({
@@ -104,7 +117,7 @@ const updateUser = async (req, res) => {
   });
 };
 
-const bulkUser = async (req, res) => {
+export const bulkUser = async (req, res) => {
   const filter = req.query.filter || "";
   const filteredUsers = await User.find({
     $or: {
@@ -119,17 +132,10 @@ const bulkUser = async (req, res) => {
 
   res.json({
     user: filteredUsers.map((user) => ({
-      username: user.username,
+      username: user.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       _id: user._id,
     })),
   });
-};
-
-module.exports = {
-  signInUser,
-  signUpUser,
-  updateUser,
-  bulkUser,
 };
