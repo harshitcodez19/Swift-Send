@@ -8,7 +8,7 @@ import {
   bulkUser,
 } from "../controller/user.controller.js";
 
-router.route("/sigininuser").post(signInUser);
+router.route("/login").post(signInUser);
 
 router.route("/signup").post(signUpUser);
 

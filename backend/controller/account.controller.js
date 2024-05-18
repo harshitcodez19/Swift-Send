@@ -2,10 +2,9 @@ import mongoose from "mongoose";
 import { Account } from "../models/accounts.model.js";
 
 export const getAccountBalance = async (req, res) => {
-  const account = Account.findOne({
+  const account = await Account.findOne({
     userId: req.userId,
   });
-
   res.status(200).json({
     balance: account.balance,
   });
@@ -20,6 +19,7 @@ export const transferPayment = async (req, res) => {
   const account = await Account.findOne({ userId: req.userId }).session(
     session
   );
+  console.log("From Account", account);
 
   if (!account || account.balance < amount) {
     return res.status(400).json({
@@ -34,6 +34,7 @@ export const transferPayment = async (req, res) => {
       message: "Invalid Account",
     });
   }
+  console.log("To Account", toAccount);
 
   await Account.updateOne(
     { userId: req.userId },
@@ -42,7 +43,7 @@ export const transferPayment = async (req, res) => {
 
   await Account.updateOne(
     { userId: to },
-    { $inc: { amount: +balance } }
+    { $inc: { balance: amount } }
   ).session(session);
 
   await session.commitTransaction();

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --experimental-json-modules index.js"
+    "dev": "nodemon --experimental-json-modules index.js",
+    "build":"nodemon"
   },
   "keywords": [],
   "author": "",

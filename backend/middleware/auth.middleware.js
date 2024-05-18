@@ -1,14 +1,16 @@
+import jwt from "jsonwebtoken";
 export const authMiddleware = async (req, res, next) => {
   const authHeader = req.headers.authorization;
+  const secret = process.env.JWT_SECRET;
 
-  if (!authHeader || !authHeader.startsWith("Bearer  ")) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(403).json({});
   }
 
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = await jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, secret);
 
     if (decoded.userId) {
       req.userId = decoded.userId;

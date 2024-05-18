@@ -42,10 +42,11 @@ export const signInUser = async (req, res) => {
       {
         userId: user._id,
       },
-      JWT_SECRET
+      process.env.JWT_SECRET
     );
 
     res.json({
+      message: "User Logged In Successfully",
       token: token,
     });
 
@@ -67,7 +68,7 @@ export const signUpUser = async (req, res) => {
     });
   }
 
-  const existingUser = await User.FindOne({
+  const existingUser = await User.findOne({
     userName: body.userName,
   });
 
@@ -87,14 +88,14 @@ export const signUpUser = async (req, res) => {
   const newUserId = newUser._id;
 
   await Account.create({
-    newUserId,
+    userId: newUserId,
     balance: 1 + Math.random() * 10000,
   });
   const token = jwt.sign(
     {
       userId: newUser._id,
     },
-    JWT_SECRET
+    process.env.JWT_SECRET
   );
 
   res.json({
@@ -119,17 +120,13 @@ export const updateUser = async (req, res) => {
 
 export const bulkUser = async (req, res) => {
   const filter = req.query.filter || "";
-  const filteredUsers = await User.find({
-    $or: {
-      firstName: {
-        $regex: filter,
-      },
-      lastName: {
-        $regex: filter,
-      },
-    },
-  });
-
+  const regexFilter = new RegExp(filter, 'i'); 
+    const filteredUsers = await User.find({
+      $or: [
+        { firstName: { $regex: regexFilter } },
+        { lastName: { $regex: regexFilter } }
+      ]
+    });
   res.json({
     user: filteredUsers.map((user) => ({
       username: user.userName,
