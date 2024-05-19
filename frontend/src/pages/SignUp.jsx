@@ -7,19 +7,25 @@ import SubHeading from "../components/SubHeading";
 import Button from "../components/Button";
 import axios from "axios";
 import { BASE_APIURL } from "../constants/ApiUrl";
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
+  const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userName, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const singUpRequest = async() =>{
-    const response = await axios.post(`${BASE_APIURL}/users/signup`,{
-      userName,firstName,lastName,password
-    })
-    localStorage.setItem("token",response.data.token)
-  }
+  const singUpRequest = async () => {
+    const response = await axios.post(`${BASE_APIURL}/users/signup`, {
+      userName,
+      firstName,
+      lastName,
+      password,
+    });
+    localStorage.setItem("token", response.data.token);
+    navigate("/dashboard");
+  };
 
   return (
     <div className="flex bg-slate-200 h-screen justify-center">

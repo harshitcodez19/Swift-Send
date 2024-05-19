@@ -1,10 +1,53 @@
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unknown-property */
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Heading } from "../components/Heading";
 import InputBox from "../components/InputBox";
+import axios from "axios";
+import { BASE_APIURL } from "../constants/ApiUrl";
+import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const SendMoney = () => {
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const name = searchParams.get("name");
+  const [amount, setAmount] = useState(0);
+  const navigate = useNavigate("");
+  const transferMoney = async () => {
+    try {
+      const response = await axios.post(
+        `${BASE_APIURL}/account/transfer`,
+        {
+          to: id,
+          amount,
+        },
+        {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
+      toast.success("Payment Completed Succesfully", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+      setAmount(0);
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Error transferring money:", error);
+    }
+  };
   return (
-    <div className="flex bg-slate-200 justify-center h-screen">
+    <div className="flex bg-slate-300 justify-center h-screen">
       <div className="flex flex-col justify-center">
         <div className="p-3 text-center h-max w-96 rounded-md bg-slate-200 shadow-md">
           <Heading label={"Transfer Money"} />
@@ -25,12 +68,22 @@ const SendMoney = () => {
                 />
               </svg>
             </div>
-            <div className="text-slate-800 font-semibold text-xl">Username</div>
+            <div className="text-slate-800 font-semibold text-xl">{name}</div>
           </div>
-          <InputBox label={"Amount (in Rs)"} placeholder={"Enter amount"} />
-          <button className="bg-green-500 w-full rounded-md mx-auto mt-2 py-1 border text-slate-200 font-bold mb-2">
+          <InputBox
+            onChange={(e) => {
+              setAmount(e.target.value);
+            }}
+            label={"Amount (in Rs)"}
+            placeholder={"Enter amount"}
+          />
+          <button
+            onClick={transferMoney}
+            className="bg-green-500 w-full rounded-md mx-auto mt-2 py-1 border text-slate-200 font-bold mb-2"
+          >
             Send Money
           </button>
+          <ToastContainer />
         </div>
       </div>
     </div>

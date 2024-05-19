@@ -1,14 +1,26 @@
 /* eslint-disable react/no-unknown-property */
 const AppBar = () => {
   return (
-    <div className="flex flex-row border-spacing-y-5 border-gray-400 bg-white mb-2 shadow-sm shadow-slate-900 px-2 py-3 justify-between">
+    <div className="flex flex-row border-gray-400 bg-white mb-2 shadow-sm shadow-slate-900 px-2 py-3 justify-between">
       <div className="text-slate-800 text-3xl font-bold  ">Swift-Send</div>
       <div className="flex flex-row justify-center p-1">
-        <div className="text-slate-800 font-semibold">Hello, User</div>
+        <div className="text-slate-800 font-semibold">
+          {localStorage.getItem("token") ? (
+            <button
+              onClick={() => {
+                localStorage.removeItem("token");
+                window.location.reload();
+              }}
+              className="bg-slate-800 text-slate-100 px-2 py-1 rounded-sm mr-3"
+            >
+              Logout
+            </button>
+          ) : null}
+        </div>
         <div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            fill="none"
+            fill="black"
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
